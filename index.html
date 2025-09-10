@@ -86,21 +86,33 @@
     </div>
     
 <script>
+    // THE ONLY CHANGE IS ON THIS LINE
     const backendUrl = 'https://script.google.com/macros/s/AKfycbzt4VDGBb1vu-HAXXWTkTa78_xCe-5R0VgHUgrQrfwBJEMsiBNAacw5H7Cj0mvnUZWM/exec'; 
+    
     let currentStep = 0;
     const formData = {};
 
+    // --- UPGRADED QUESTION SET ---
     const questions = [
+        // Foundational
         { id: 'companyName', name: 'Company Name', type: 'text', title: 'What is the name of your company?', placeholder: 'e.g., Acme Corporation', weight: 0 },
         { id: 'fullName', name: 'Full Name', type: 'text', title: "What's your full name?", placeholder: 'e.g., John Doe', weight: 0 },
         { id: 'role', name: 'Your Role', type: 'text', title: 'And your current role?', placeholder: 'e.g., CEO, Founder', weight: 0 },
         { id: 'businessModel', name: 'Business Model', type: 'choice', title: 'What is your primary business model?', options: ['SaaS', 'E-commerce', 'Agency', 'Coaching/Consulting', 'Local Business', 'Other'], weight: 0 },
+        
+        // Marketing ROI
         { id: 'marketingROI', name: 'Marketing ROI Confidence', type: 'rating', title: 'How confident are you in the ROI of your marketing spend?', subtitle: '1 = Blindly Spending, 10 = Every Dollar Tracked', leakArea: 'Marketing ROI', weight: 15 },
         { id: 'leadQuality', name: 'Lead Quality', type: 'rating', title: 'How would you rate your average lead quality?', subtitle: '1 = Poor, 10 = Perfect Fit', leakArea: 'Marketing ROI', weight: 20 },
+
+        // Sales Efficiency
         { id: 'closeRate', name: 'Close Rate', type: 'choice', title: 'What is your sales team\'s approximate close rate?', options: ['< 10%', '10-20%', '20-30%', '30-40%', '40%+'], leakArea: 'Sales Efficiency', weight: 25 },
         { id: 'averageSalesCycle', name: 'Average Sales Cycle', type: 'choice', title: 'What is your average sales cycle length?', options: ['< 30 days', '30-60 days', '60-90 days', '> 90 days'], leakArea: 'Sales Efficiency', weight: 15 },
+
+        // Customer Retention
         { id: 'customerChurn', name: 'Customer Churn', type: 'choice', title: 'What is your approximate monthly customer churn rate?', options: ['< 1%', '1-3%', '3-5%', '> 5%'], leakArea: 'Customer Retention', weight: 30 },
         { id: 'customerUpsellRate', name: 'Customer Upsell Rate', type: 'rating', title: 'How effective is your process for upselling existing customers?', subtitle: '1 = Non-existent, 10 = Highly Effective', leakArea: 'Customer Retention', weight: 10 },
+
+        // Operations
         { id: 'useCRM', name: 'CRM Usage', type: 'rating', title: 'How effectively is a CRM integrated into your process?', subtitle: '1 = Not at all, 10 = It\'s our command center', leakArea: 'Operations', weight: 15 },
         { id: 'salesMarketingAlignment', name: 'Sales & Marketing Alignment', type: 'rating', title: 'How aligned are your Sales & Marketing teams?', subtitle: '1 = Disconnected, 10 = Perfectly Synced', leakArea: 'Operations', weight: 20 },
     ];
@@ -197,7 +209,6 @@
         else document.getElementById('severityText').style.color = '#22c55e';
     }
     
-    // --- SUBMISSION LOGIC ENABLED ---
     async function submitData() {
         const emailInput = document.getElementById('email-input');
         if (!emailInput.value.includes('@')) { alert('Please enter a valid email.'); return; }
@@ -205,10 +216,9 @@
         
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Analyzing & Submitting...';
+        submitBtn.textContent = 'Analyzing...';
 
         try {
-            // Add final calculated values to the form data before sending
             const { score, severity } = calculateWeightedScore(formData);
             const bottleneck = findPrimaryBottleneck(formData);
             formData.leakScore = score;
@@ -221,9 +231,6 @@
                 body: JSON.stringify(formData)
             });
 
-            // We don't need to check response.ok here, as our primary goal
-            // is to show the user a success state. The backend logs will tell us
-            // if there was a real failure. This provides a better user experience.
             console.log("Submission attempt finished.");
 
             formContainer.style.display = 'none';
@@ -231,8 +238,6 @@
 
         } catch (error) {
             console.error('Critical Submission Failure:', error);
-            // Even in a critical failure, we move to the thank you page to avoid
-            // a frustrating dead end for the user. Our logs will have the error.
             formContainer.style.display = 'none';
             thankYouPage.style.display = 'flex';
         }
@@ -297,4 +302,6 @@
 
 </body>
 </html>
+
+
 
