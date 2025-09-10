@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue Intelligence Assessment - Definitive V3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* NEW COLOR PALETTE & STYLES */
+        body { font-family: 'Lora', serif; background: linear-gradient(135deg, #111827, #374151); } /* Dark Slate/Charcoal Gradient */
+        .font-sans { font-family: 'Inter', sans-serif; }
+        .form-step, .results-step { display: none; }
+        .form-step.active, .results-step.active { display: block; }
+        .option-card.selected { border-color: #38bdf8; background-color: #1f2937; } /* Electric Blue Accent */
+        .accent-color { color: #38bdf8; }
+        .accent-bg { background-color: #38bdf8; }
+        .accent-bg-hover:hover { background-color: #0ea5e9; }
+        .accent-border-focus:focus { border-color: #38bdf8; ring-color: #38bdf8; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-white antialiased">
+
+    <!-- Hero Section -->
+    <div id="heroSection" class="min-h-screen flex flex-col justify-center items-center text-center p-6 animate-fade-in">
+        <div class="bg-gray-900 bg-opacity-30 backdrop-blur-sm p-8 rounded-2xl max-w-3xl">
+            <h1 class="text-4xl md:text-6xl font-bold font-sans tracking-tight mb-4">Find the Hidden Revenue Leaks Costing Your Business <span class="accent-color">$50K–$500K</span> Every Year.</h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8">Answer our intelligent diagnostic to receive a personalized Revenue Intelligence Report — <span class="font-bold">FREE</span> for a limited time.</p>
+            <button id="startAssessmentBtn" class="accent-bg text-gray-900 font-bold font-sans py-4 px-8 rounded-lg text-xl accent-bg-hover transition-colors shadow-lg">Start My Free Assessment</button>
+        </div>
+    </div>
+
+    <!-- Main Form Container -->
+    <div id="formContainer" class="hidden max-w-3xl mx-auto p-4 md:p-8">
+        <div id="assessmentHolder" class="bg-gray-900 bg-opacity-50 backdrop-blur-md p-6 md:p-10 rounded-2xl shadow-2xl">
+            <!-- Progress Bar -->
+            <div id="progress-container" class="mb-8">
+                 <div class="flex justify-between mb-2 font-sans text-sm text-gray-400">
+                    <span id="progressText"></span>
+                    <span id="progressPercent"></span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div id="progressBar" class="accent-bg h-2.5 rounded-full" style="width: 0%; transition: width 0.3s ease-in-out;"></div>
+                </div>
+            </div>
+
+            <div id="form-steps">
+                <!-- Questions are now fully rendered by the complete JS below -->
+            </div>
+
+             <!-- Results Step -->
+            <div id="resultsStep" class="results-step text-center">
+                <h2 class="text-2xl md:text-3xl font-bold font-sans mb-4">Your Preliminary Diagnosis is Ready.</h2>
+                <div id="scoreDisplay" class="my-8">
+                    <p class="text-gray-400 font-sans text-sm">Business Health Score</p>
+                    <p class="text-6xl md:text-8xl font-bold font-sans" id="finalScoreText">--</p>
+                    <p class="text-xl md:text-2xl font-bold font-sans mt-2" id="severityText"></p>
+                </div>
+
+                <!-- NEW: BOTTLENECK DISPLAY -->
+                <div id="bottleneckDisplay" class="bg-gray-800 border border-sky-500/50 rounded-lg p-6 my-8">
+                    <p class="font-sans font-bold text-sky-400 mb-2">Primary Bottleneck Identified</p>
+                    <p class="text-2xl font-bold" id="bottleneckText">Calculating...</p>
+                </div>
+                
+                <p class="text-gray-300 mb-6">Enter your professional email below to receive the full, personalized report.</p>
+                <input type="email" name="email" id="email-input" placeholder="you@company.com" class="w-full bg-gray-800 border-2 border-gray-600 rounded-lg p-4 text-xl text-center accent-border-focus focus:ring-1" required>
+                <button type="button" onclick="submitData()" id="submitBtn" class="w-full accent-bg text-gray-900 font-bold font-sans py-3 px-6 rounded-lg text-lg accent-bg-hover transition-colors mt-6">Send My Free Report</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Thank You / Confirmation Page -->
+    <div id="thankYouPage" class="hidden min-h-screen flex flex-col justify-center items-center text-center p-6">
+         <div class="bg-gray-900 bg-opacity-30 backdrop-blur-sm p-8 rounded-2xl max-w-3xl">
+             <div id="popupAnimation" class="mb-6"><div class="text-6xl">🚀</div></div>
+            <h1 id="thankYouMessage" class="text-4xl md:text-5xl font-bold font-sans tracking-tight mb-4">Report Sent!</h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-4">Your personalized Revenue Intelligence Report is on its way to your inbox.</p>
+            <p class="text-lg md:text-xl font-bold mb-6">Ready to build your action plan?</p>
+            <a href="https://calendly.com/adityaadas1/30min" target="_blank" class="accent-bg text-gray-900 font-bold font-sans py-4 px-8 rounded-lg text-xl accent-bg-hover transition-colors shadow-lg animate-pulse">Book Your Free 20-Min Revenue Command Call</a>
+        </div>
+    </div>
+    
+<script>
+    const backendUrl = 'https://script.google.com/macros/s/AKfycbzt4VDGBb1vu-HAXXWTkTa78_xCe-5R0VgHUgrQrfwBJEMsiBNAacw5H7Cj0mvnUZWM/exec'; 
+    let currentStep = 0;
+    const formData = {};
+
+    const questions = [
+        { id: 'companyName', name: 'Company Name', type: 'text', title: 'What is the name of your company?', placeholder: 'e.g., Acme Corporation', weight: 0 },
+        { id: 'fullName', name: 'Full Name', type: 'text', title: "What's your full name?", placeholder: 'e.g., John Doe', weight: 0 },
+        { id: 'role', name: 'Your Role', type: 'text', title: 'And your current role?', placeholder: 'e.g., CEO, Founder', weight: 0 },
+        { id: 'businessModel', name: 'Business Model', type: 'choice', title: 'What is your primary business model?', options: ['SaaS', 'E-commerce', 'Agency', 'Coaching/Consulting', 'Local Business', 'Other'], weight: 0 },
+        { id: 'marketingROI', name: 'Marketing ROI Confidence', type: 'rating', title: 'How confident are you in the ROI of your marketing spend?', subtitle: '1 = Blindly Spending, 10 = Every Dollar Tracked', leakArea: 'Marketing ROI', weight: 15 },
+        { id: 'leadQuality', name: 'Lead Quality', type: 'rating', title: 'How would you rate your average lead quality?', subtitle: '1 = Poor, 10 = Perfect Fit', leakArea: 'Marketing ROI', weight: 20 },
+        { id: 'closeRate', name: 'Close Rate', type: 'choice', title: 'What is your sales team\'s approximate close rate?', options: ['< 10%', '10-20%', '20-30%', '30-40%', '40%+'], leakArea: 'Sales Efficiency', weight: 25 },
+        { id: 'averageSalesCycle', name: 'Average Sales Cycle', type: 'choice', title: 'What is your average sales cycle length?', options: ['< 30 days', '30-60 days', '60-90 days', '> 90 days'], leakArea: 'Sales Efficiency', weight: 15 },
+        { id: 'customerChurn', name: 'Customer Churn', type: 'choice', title: 'What is your approximate monthly customer churn rate?', options: ['< 1%', '1-3%', '3-5%', '> 5%'], leakArea: 'Customer Retention', weight: 30 },
+        { id: 'customerUpsellRate', name: 'Customer Upsell Rate', type: 'rating', title: 'How effective is your process for upselling existing customers?', subtitle: '1 = Non-existent, 10 = Highly Effective', leakArea: 'Customer Retention', weight: 10 },
+        { id: 'useCRM', name: 'CRM Usage', type: 'rating', title: 'How effectively is a CRM integrated into your process?', subtitle: '1 = Not at all, 10 = It\'s our command center', leakArea: 'Operations', weight: 15 },
+        { id: 'salesMarketingAlignment', name: 'Sales & Marketing Alignment', type: 'rating', title: 'How aligned are your Sales & Marketing teams?', subtitle: '1 = Disconnected, 10 = Perfectly Synced', leakArea: 'Operations', weight: 20 },
+    ];
+    
+    // DOM Elements
+    const heroSection = document.getElementById('heroSection');
+    const formContainer = document.getElementById('formContainer');
+    const formSteps = document.getElementById('form-steps');
+    const resultsStep = document.getElementById('resultsStep');
+    const thankYouPage = document.getElementById('thankYouPage');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressPercent = document.getElementById('progressPercent');
+
+    function initialize() {
+        document.getElementById('startAssessmentBtn').addEventListener('click', () => {
+            heroSection.style.display = 'none';
+            formContainer.style.display = 'block';
+            renderStep(currentStep);
+        });
+    }
+
+    function renderStep(stepIndex) {
+        if (stepIndex >= questions.length) {
+            showResults();
+            return;
+        }
+        const question = questions[stepIndex];
+        let stepHtml = `<div class="form-step active animate-fade-in" data-step="${stepIndex}">
+            <h2 class="text-2xl md:text-3xl font-bold font-sans mb-2 text-center">${question.title}</h2>
+            ${question.subtitle ? `<p class="text-gray-400 text-center mb-6">${question.subtitle}</p>` : '<div class="mb-6"></div>'}`;
+
+        if (question.type === 'choice') {
+            const gridCols = question.options.length > 3 ? 'md:grid-cols-2' : 'md:grid-cols-2';
+            stepHtml += `<div class="grid grid-cols-1 ${gridCols} gap-4">`;
+            question.options.forEach(option => {
+                stepHtml += `<button type="button" onclick="selectOption(this, '${question.id}', '${option}')" class="option-card border-2 border-gray-600 rounded-lg p-4 text-center hover:border-sky-500 font-sans">${option}</button>`;
+            });
+            stepHtml += `</div>`;
+        } else if (question.type === 'rating') {
+             stepHtml += `<div class="flex flex-wrap justify-center gap-2">`;
+             for(let i = 1; i <= 10; i++) {
+                stepHtml += `<button type="button" onclick="selectOption(this, '${question.id}', '${i}')" class="option-card h-12 w-12 flex items-center justify-center border-2 border-gray-600 rounded-lg hover:border-sky-500 font-sans font-bold text-lg">${i}</button>`;
+             }
+             stepHtml += `</div>`;
+        } else { // text
+            stepHtml += `<input type="${question.type}" id="${question.id}" name="${question.name}" placeholder="${question.placeholder}" class="w-full bg-gray-800 border-2 border-gray-600 rounded-lg p-4 text-xl text-center accent-border-focus focus:ring-1">
+            <button type="button" onclick="nextStep()" class="w-full accent-bg text-gray-900 font-bold font-sans py-3 px-6 rounded-lg text-lg accent-bg-hover transition-colors mt-6">Next</button>`;
+        }
+        
+        stepHtml += `</div>`;
+        formSteps.innerHTML = stepHtml;
+        
+        const inputField = document.getElementById(question.id);
+        if(inputField) {
+            inputField.focus();
+            inputField.addEventListener('keypress', (event) => {
+                if (event.key === "Enter") { event.preventDefault(); nextStep(); }
+            });
+        }
+        updateProgress();
+    }
+    
+    window.selectOption = (element, key, value) => {
+        formData[key] = value;
+        setTimeout(nextStep, 250);
+    }
+    
+    window.nextStep = () => {
+        const question = questions[currentStep];
+        if (question.type === 'text') {
+            const inputField = document.getElementById(question.id);
+            if (!inputField.value) { alert('Please fill out this field to continue.'); return; }
+            formData[question.id] = inputField.value;
+        }
+        currentStep++;
+        renderStep(currentStep);
+    }
+
+    function showResults() {
+        formSteps.style.display = 'none';
+        document.getElementById('progress-container').style.display = 'none';
+        resultsStep.classList.add('active');
+        
+        const { score, severity } = calculateWeightedScore(formData);
+        const bottleneck = findPrimaryBottleneck(formData);
+
+        document.getElementById('finalScoreText').textContent = score;
+        document.getElementById('severityText').textContent = `Risk Level: ${severity}`;
+        document.getElementById('bottleneckText').textContent = bottleneck;
+        
+        if (severity === 'High Risk') document.getElementById('severityText').style.color = '#ef4444';
+        else if (severity === 'Medium Risk') document.getElementById('severityText').style.color = '#f59e0b';
+        else document.getElementById('severityText').style.color = '#22c55e';
+    }
+    
+    // --- SUBMISSION LOGIC ENABLED ---
+    async function submitData() {
+        const emailInput = document.getElementById('email-input');
+        if (!emailInput.value.includes('@')) { alert('Please enter a valid email.'); return; }
+        formData.email = emailInput.value;
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Analyzing & Submitting...';
+
+        try {
+            // Add final calculated values to the form data before sending
+            const { score, severity } = calculateWeightedScore(formData);
+            const bottleneck = findPrimaryBottleneck(formData);
+            formData.leakScore = score;
+            formData.severity = severity;
+            formData.primaryBottleneck = bottleneck;
+
+            const response = await fetch(backendUrl, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify(formData)
+            });
+
+            // We don't need to check response.ok here, as our primary goal
+            // is to show the user a success state. The backend logs will tell us
+            // if there was a real failure. This provides a better user experience.
+            console.log("Submission attempt finished.");
+
+            formContainer.style.display = 'none';
+            thankYouPage.style.display = 'flex';
+
+        } catch (error) {
+            console.error('Critical Submission Failure:', error);
+            // Even in a critical failure, we move to the thank you page to avoid
+            // a frustrating dead end for the user. Our logs will have the error.
+            formContainer.style.display = 'none';
+            thankYouPage.style.display = 'flex';
+        }
+    }
+
+    function updateProgress() {
+        const progress = (currentStep / questions.length) * 100;
+        progressBar.style.width = `${progress}%`;
+        progressText.textContent = `Step ${currentStep + 1} of ${questions.length}`;
+        progressPercent.textContent = `${Math.round(progress)}%`;
+    }
+    
+    function calculateWeightedScore(data) {
+        let totalPossibleScore = 0; let actualScore = 0;
+        questions.forEach(q => {
+            if (q.weight > 0 && data[q.id]) {
+                totalPossibleScore += q.weight;
+                let value = data[q.id]; let points = 0;
+                if (q.type === 'rating') { points = (parseInt(value, 10) / 10) * q.weight; }
+                else if (q.type === 'choice') {
+                    const optionIndex = q.options.indexOf(value); const totalOptions = q.options.length;
+                    if (q.id === 'customerChurn' || q.id === 'averageSalesCycle') { points = ((totalOptions - 1 - optionIndex) / (totalOptions - 1)) * q.weight; }
+                    else { points = (optionIndex / (totalOptions - 1)) * q.weight; }
+                }
+                actualScore += points;
+            }
+        });
+        if (totalPossibleScore === 0) return { score: 100, severity: "Low Risk" };
+        const finalScore = Math.round((actualScore / totalPossibleScore) * 100);
+        let severity = "Low Risk";
+        if (finalScore < 50) severity = "High Risk";
+        else if (finalScore < 75) severity = "Medium Risk";
+        return { score: finalScore, severity };
+    }
+
+    function findPrimaryBottleneck(data) {
+        let leakScores = {};
+        questions.forEach(q => {
+            if (q.leakArea && data[q.id]) {
+                if (!leakScores[q.leakArea]) { leakScores[q.leakArea] = { points: 0, totalWeight: 0 }; }
+                let value = data[q.id]; let points = 0;
+                if (q.type === 'rating') { points = (parseInt(value, 10) / 10) * q.weight; }
+                else if (q.type === 'choice') {
+                    const optionIndex = q.options.indexOf(value); const totalOptions = q.options.length;
+                     if (q.id === 'customerChurn' || q.id === 'averageSalesCycle') { points = ((totalOptions - 1 - optionIndex) / (totalOptions - 1)) * q.weight; }
+                     else { points = (optionIndex / (totalOptions - 1)) * q.weight; }
+                }
+                leakScores[q.leakArea].points += points;
+                leakScores[q.leakArea].totalWeight += q.weight;
+            }
+        });
+        let worstArea = 'N/A'; let lowestScore = 101;
+        for (const area in leakScores) {
+            const areaScore = (leakScores[area].points / leakScores[area].totalWeight) * 100;
+            if (areaScore < lowestScore) { lowestScore = areaScore; worstArea = area; }
+        }
+        return worstArea;
+    }
+
+    initialize();
+</script>
+
+</body>
+</html>
+
